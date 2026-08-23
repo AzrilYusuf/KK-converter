@@ -21,11 +21,28 @@
     {{-- Right: tabbed form --}}
     <div class="lg:w-1/2 lg:h-full lg:overflow-y-auto bg-white">
         <div
-            x-data="kkForm(@js(old('anggota', [])))"
+            x-data="kkForm(@js(old('anggota', [])), @js(route('keluarga.ocr', $upload)))"
             class="p-6"
         >
             <h1 class="text-xl font-semibold text-gray-900 mb-1">Input Data Kartu Keluarga</h1>
-            <p class="text-sm text-gray-500 mb-6">Isi data sesuai dokumen di sebelah kiri.</p>
+            <p class="text-sm text-gray-500 mb-4">Isi data sesuai dokumen di sebelah kiri.</p>
+
+            <div class="mb-6">
+                <button type="button" @click="runOcr()" :disabled="ocrLoading"
+                    class="inline-flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg x-show="ocrLoading" x-cloak class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                    <span x-text="ocrLoading ? 'Memproses OCR...' : 'Isi Otomatis dari OCR'"></span>
+                </button>
+                <p class="mt-2 text-xs text-gray-500">
+                    Mengisi otomatis field No. KK, Kepala Keluarga, Alamat, dan Kepala Dinas dari hasil pindai. Data anggota keluarga tetap diisi manual. Selalu periksa kembali hasilnya sebelum menyimpan.
+                </p>
+                <p x-show="ocrMessage" x-cloak x-text="ocrMessage"
+                    :class="ocrError ? 'text-red-600' : 'text-green-600'"
+                    class="mt-2 text-xs font-medium"></p>
+            </div>
 
             @if ($errors->any())
                 <div class="mb-6 rounded-md bg-red-50 border border-red-200 text-red-800 px-4 py-3 text-sm">
@@ -271,7 +288,7 @@
 </div>
 
 <script>
-    function kkForm(initialAnggota) {
+    function kkForm(initialAnggota, ocrUrl) {
         const emptyAnggota = () => ({
             nama_lengkap: '',
             nik: '',
@@ -302,6 +319,52 @@
             },
             removeAnggota(index) {
                 this.anggota.splice(index, 1);
+            },
+            ocrLoading: false,
+            ocrMessage: '',
+            ocrError: false,
+            async runOcr() {
+                this.ocrLoading = true;
+                this.ocrMessage = '';
+                this.ocrError = false;
+
+                try {
+                    const response = await fetch(ocrUrl, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json',
+                        },
+                    });
+                    const data = await response.json();
+
+                    if (!response.ok || !data.success) {
+                        this.ocrError = true;
+                        this.ocrMessage = data.message || 'OCR gagal diproses. Silakan isi data secara manual.';
+                        return;
+                    }
+
+                    const fields = data.fields || {};
+                    let filledCount = 0;
+
+                    for (const [name, value] of Object.entries(fields)) {
+                        const input = document.querySelector(`[name="${name}"]`);
+                        if (input && value) {
+                            input.value = value;
+                            filledCount++;
+                        }
+                    }
+
+                    this.ocrError = false;
+                    this.ocrMessage = filledCount > 0
+                        ? `${filledCount} field terisi otomatis. Mohon periksa kembali sebelum menyimpan.`
+                        : 'Tidak ada field yang berhasil dikenali. Silakan isi manual.';
+                } catch (e) {
+                    this.ocrError = true;
+                    this.ocrMessage = 'OCR gagal diproses. Silakan isi data secara manual.';
+                } finally {
+                    this.ocrLoading = false;
+                }
             },
         };
     }

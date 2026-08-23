@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\KeluargaExport;
 use App\Http\Requests\StoreKeluargaRequest;
 use App\Models\Upload;
+use App\Services\KkOcrService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -58,6 +59,25 @@ class KeluargaController extends Controller
         });
 
         return redirect()->route('keluarga.success', $upload);
+    }
+
+    public function ocr(Upload $upload, KkOcrService $ocrService)
+    {
+        try {
+            $fields = $ocrService->extract($upload);
+        } catch (Throwable $e) {
+            Log::error('KK OCR endpoint failed', ['upload_id' => $upload->id, 'message' => $e->getMessage()]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'OCR gagal diproses. Silakan isi data secara manual.',
+            ], 500);
+        }
+
+        return response()->json([
+            'success' => true,
+            'fields' => $fields,
+        ]);
     }
 
     public function success(Upload $upload)
