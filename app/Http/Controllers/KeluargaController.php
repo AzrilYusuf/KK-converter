@@ -64,7 +64,7 @@ class KeluargaController extends Controller
     public function ocr(Upload $upload, KkOcrService $ocrService)
     {
         try {
-            $fields = $ocrService->extract($upload);
+            $result = $ocrService->extract($upload);
         } catch (Throwable $e) {
             Log::error('KK OCR endpoint failed', ['upload_id' => $upload->id, 'message' => $e->getMessage()]);
 
@@ -76,7 +76,8 @@ class KeluargaController extends Controller
 
         return response()->json([
             'success' => true,
-            'fields' => $fields,
+            'fields' => $result['fields'],
+            'anggota' => $result['anggota'],
         ]);
     }
 

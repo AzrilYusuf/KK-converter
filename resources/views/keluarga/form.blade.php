@@ -355,9 +355,28 @@
                         }
                     }
 
+                    const detectedAnggota = data.anggota || [];
+                    let anggotaFilled = 0;
+
+                    if (detectedAnggota.length > 0) {
+                        const isUntouched = this.anggota.length === 1
+                            && JSON.stringify(this.anggota[0]) === JSON.stringify(emptyAnggota());
+
+                        const proceed = isUntouched || confirm(
+                            `Ditemukan ${detectedAnggota.length} anggota dari hasil OCR. ` +
+                            'Ini akan menggantikan data anggota yang sudah diisi pada tab Anggota Keluarga. Lanjutkan?'
+                        );
+
+                        if (proceed) {
+                            this.anggota = detectedAnggota.map(row => ({ ...emptyAnggota(), ...row }));
+                            anggotaFilled = detectedAnggota.length;
+                        }
+                    }
+
                     this.ocrError = false;
-                    this.ocrMessage = filledCount > 0
-                        ? `${filledCount} field terisi otomatis. Mohon periksa kembali sebelum menyimpan.`
+                    this.ocrMessage = (filledCount > 0 || anggotaFilled > 0)
+                        ? `${filledCount} field kepala keluarga/dinas terisi, ${anggotaFilled} anggota terdeteksi. `
+                            + 'OCR pada tabel anggota rawan keliru (NIK, tanggal, dsb) — periksa setiap baris dengan teliti sebelum menyimpan.'
                         : 'Tidak ada field yang berhasil dikenali. Silakan isi manual.';
                 } catch (e) {
                     this.ocrError = true;
