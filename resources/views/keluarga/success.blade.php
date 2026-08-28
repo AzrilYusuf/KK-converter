@@ -16,7 +16,7 @@
         </p>
     </div>
 
-    <div class="bg-white border border-gray-200 rounded-md p-6 mb-6">
+    <div class="bg-white border border-brand-100 rounded-2xl p-6 mb-6">
         <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
             <div>
                 <dt class="text-gray-500">No. KK</dt>
@@ -39,15 +39,15 @@
 
     <div class="flex flex-col sm:flex-row gap-3">
         <a href="{{ route('keluarga.export', $upload) }}"
-            class="flex-1 inline-flex items-center justify-center rounded-md bg-gray-800 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-900 transition">
+            class="flex-1 inline-flex items-center justify-center rounded-full bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 transition">
             Export ke XLSX
         </a>
         <a href="{{ route('upload.create') }}"
-            class="flex-1 inline-flex items-center justify-center rounded-md border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+            class="flex-1 inline-flex items-center justify-center rounded-full border border-brand-300 px-4 py-2.5 text-sm font-semibold text-brand-600 hover:bg-brand-50 transition">
             Unggah KK Lain
         </a>
         <a href="{{ route('keluarga.index') }}"
-            class="flex-1 inline-flex items-center justify-center rounded-md border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+            class="flex-1 inline-flex items-center justify-center rounded-full border border-brand-300 px-4 py-2.5 text-sm font-semibold text-brand-600 hover:bg-brand-50 transition">
             Lihat Daftar KK
         </a>
     </div>

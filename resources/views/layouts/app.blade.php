@@ -7,22 +7,43 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-100 text-gray-900 antialiased h-full">
+<body class="bg-brand-50 text-gray-900 antialiased h-full">
     <div class="min-h-screen flex flex-col">
-        <header class="bg-white border-b border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-                <a href="{{ route('upload.create') }}" class="font-semibold text-gray-800">KK Converter</a>
-                <nav class="flex items-center gap-4 text-sm">
-                    <a href="{{ route('keluarga.index') }}" class="text-gray-600 hover:text-gray-900">Daftar KK</a>
-                    <a href="{{ route('upload.create') }}" class="text-gray-600 hover:text-gray-900">Unggah KK</a>
+        <header class="bg-white border-b border-brand-100">
+            <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-6">
+                <a href="{{ route('upload.create') }}" class="flex items-center gap-2 font-bold text-gray-900 shrink-0">
+                    <x-brand-icon />
+                    KK Converter
+                </a>
+
+                <nav class="hidden sm:flex items-center gap-6 text-sm font-medium">
+                    <a href="{{ route('upload.create') }}"
+                        class="transition {{ request()->routeIs('upload.create') ? 'text-brand-600' : 'text-gray-600 hover:text-gray-900' }}">
+                        Convert
+                    </a>
+                    <a href="{{ route('keluarga.index') }}"
+                        class="transition {{ request()->routeIs('keluarga.*') ? 'text-brand-600' : 'text-gray-600 hover:text-gray-900' }}">
+                        Daftar KK
+                    </a>
                 </nav>
+
+                <div class="flex items-center gap-3 shrink-0">
+                    <button type="button" disabled title="Segera hadir"
+                        class="text-sm font-medium text-gray-500 cursor-not-allowed">
+                        Sign In
+                    </button>
+                    <button type="button" disabled title="Segera hadir"
+                        class="rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-white opacity-80 cursor-not-allowed">
+                        Sign Up
+                    </button>
+                </div>
             </div>
         </header>
 
         <main class="flex-1">
             @if (session('success'))
                 <div class="max-w-7xl mx-auto px-4 pt-4">
-                    <div class="rounded-md bg-green-50 border border-green-200 text-green-800 px-4 py-3 text-sm">
+                    <div class="rounded-xl bg-green-50 border border-green-200 text-green-800 px-4 py-3 text-sm">
                         {{ session('success') }}
                     </div>
                 </div>
@@ -30,7 +51,7 @@
 
             @if (session('error'))
                 <div class="max-w-7xl mx-auto px-4 pt-4">
-                    <div class="rounded-md bg-red-50 border border-red-200 text-red-800 px-4 py-3 text-sm">
+                    <div class="rounded-xl bg-red-50 border border-red-200 text-red-800 px-4 py-3 text-sm">
                         {{ session('error') }}
                     </div>
                 </div>

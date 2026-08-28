@@ -32,7 +32,7 @@
             @if ($upload)
                 <div class="mb-6">
                     <button type="button" @click="runOcr()" :disabled="ocrLoading"
-                        class="inline-flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="inline-flex items-center gap-2 rounded-full border border-brand-300 px-4 py-2 text-sm font-semibold text-brand-600 hover:bg-brand-50 transition disabled:opacity-50 disabled:cursor-not-allowed">
                         <svg x-show="ocrLoading" x-cloak class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
@@ -63,17 +63,17 @@
             <div class="border-b border-gray-200 mb-6">
                 <nav class="flex gap-6 text-sm font-medium">
                     <button type="button" @click="activeTab = 'kepala'"
-                        :class="activeTab === 'kepala' ? 'border-gray-800 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                        :class="activeTab === 'kepala' ? 'border-brand-500 text-brand-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
                         class="pb-3 border-b-2 transition">
                         1. Kepala Keluarga &amp; Alamat
                     </button>
                     <button type="button" @click="activeTab = 'anggota'"
-                        :class="activeTab === 'anggota' ? 'border-gray-800 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                        :class="activeTab === 'anggota' ? 'border-brand-500 text-brand-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
                         class="pb-3 border-b-2 transition">
                         2. Anggota Keluarga
                     </button>
                     <button type="button" @click="activeTab = 'dinas'"
-                        :class="activeTab === 'dinas' ? 'border-gray-800 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                        :class="activeTab === 'dinas' ? 'border-brand-500 text-brand-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
                         class="pb-3 border-b-2 transition">
                         3. Kepala Dinas
                     </button>
@@ -283,11 +283,11 @@
 
                 <div class="mt-8 pt-6 border-t border-gray-200 flex gap-3">
                     <a href="{{ route('keluarga.index') }}"
-                        class="flex-1 text-center rounded-md border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                        class="flex-1 text-center rounded-full border border-brand-300 px-4 py-2.5 text-sm font-semibold text-brand-600 hover:bg-brand-50 transition">
                         Batal
                     </a>
                     <button type="submit"
-                        class="flex-1 rounded-md bg-gray-800 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-900 transition">
+                        class="flex-1 rounded-full bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 transition">
                         Simpan Perubahan
                     </button>
                 </div>
