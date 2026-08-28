@@ -16,27 +16,29 @@
                     KK Converter
                 </a>
 
-                <nav class="hidden sm:flex items-center gap-6 text-sm font-medium">
-                    <a href="{{ route('upload.create') }}"
-                        class="transition {{ request()->routeIs('upload.create') ? 'text-brand-600' : 'text-gray-600 hover:text-gray-900' }}">
-                        Convert
-                    </a>
-                    <a href="{{ route('keluarga.index') }}"
-                        class="transition {{ request()->routeIs('keluarga.*') ? 'text-brand-600' : 'text-gray-600 hover:text-gray-900' }}">
-                        Daftar KK
-                    </a>
-                </nav>
+                @auth
+                    <nav class="hidden sm:flex items-center gap-6 text-sm font-medium">
+                        <a href="{{ route('upload.create') }}"
+                            class="transition {{ request()->routeIs('upload.create') ? 'text-brand-600' : 'text-gray-600 hover:text-gray-900' }}">
+                            Convert
+                        </a>
+                        <a href="{{ route('keluarga.index') }}"
+                            class="transition {{ request()->routeIs('keluarga.*') ? 'text-brand-600' : 'text-gray-600 hover:text-gray-900' }}">
+                            Daftar KK
+                        </a>
+                    </nav>
 
-                <div class="flex items-center gap-3 shrink-0">
-                    <button type="button" disabled title="Segera hadir"
-                        class="text-sm font-medium text-gray-500 cursor-not-allowed">
-                        Sign In
-                    </button>
-                    <button type="button" disabled title="Segera hadir"
-                        class="rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-white opacity-80 cursor-not-allowed">
-                        Sign Up
-                    </button>
-                </div>
+                    <div class="flex items-center gap-3 shrink-0">
+                        <span class="hidden sm:inline text-sm text-gray-500">{{ auth()->user()->email }}</span>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit"
+                                class="rounded-full border border-brand-300 px-4 py-2 text-sm font-semibold text-brand-600 hover:bg-brand-50 transition">
+                                Keluar
+                            </button>
+                        </form>
+                    </div>
+                @endauth
             </div>
         </header>
 

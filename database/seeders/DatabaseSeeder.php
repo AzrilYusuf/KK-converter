@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,11 +16,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        if (User::where('email', 'admin@kkconverter.local')->exists()) {
+            return;
+        }
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $password = Str::password(16);
+
+        User::create([
+            'name' => 'Admin',
+            'email' => 'admin@kkconverter.local',
+            'email_verified_at' => now(),
+            'password' => $password,
         ]);
+
+        $this->command->info("Admin account created — email: admin@kkconverter.local / password: {$password}");
     }
 }
