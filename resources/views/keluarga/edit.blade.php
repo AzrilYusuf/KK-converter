@@ -1,48 +1,52 @@
 @extends('layouts.app')
 
-@section('title', 'Isi Data Kartu Keluarga')
+@section('title', 'Edit Data Kartu Keluarga')
 
 @section('content')
 <div class="flex flex-col lg:flex-row lg:h-[calc(100vh-57px)]">
-    {{-- Left: document preview --}}
-    <div class="lg:w-1/2 bg-gray-800 lg:h-full flex flex-col">
-        <div class="px-4 py-2 text-xs text-gray-300 border-b border-gray-700">
-            Referensi: {{ $upload->original_filename }}
+    @if ($upload)
+        {{-- Left: document preview --}}
+        <div class="lg:w-1/2 bg-gray-800 lg:h-full flex flex-col">
+            <div class="px-4 py-2 text-xs text-gray-300 border-b border-gray-700">
+                Referensi: {{ $upload->original_filename }}
+            </div>
+            <div class="flex-1 overflow-auto p-4">
+                @if ($upload->file_type === 'pdf')
+                    <iframe src="{{ $previewUrl }}" class="w-full h-[80vh] lg:h-full bg-white rounded"></iframe>
+                @else
+                    <img src="{{ $previewUrl }}" alt="Preview Kartu Keluarga" class="w-full h-auto rounded mx-auto">
+                @endif
+            </div>
         </div>
-        <div class="flex-1 overflow-auto p-4">
-            @if ($upload->file_type === 'pdf')
-                <iframe src="{{ $previewUrl }}" class="w-full h-[80vh] lg:h-full bg-white rounded"></iframe>
-            @else
-                <img src="{{ $previewUrl }}" alt="Preview Kartu Keluarga" class="w-full h-auto rounded mx-auto">
-            @endif
-        </div>
-    </div>
+    @endif
 
     {{-- Right: tabbed form --}}
-    <div class="lg:w-1/2 lg:h-full lg:overflow-y-auto bg-white">
+    <div class="{{ $upload ? 'lg:w-1/2' : 'w-full max-w-3xl mx-auto' }} lg:h-full lg:overflow-y-auto bg-white">
         <div
-            x-data="kkForm(@js(old('anggota', [])), @js(route('keluarga.ocr', $upload)))"
+            x-data="kkForm(@js($initialAnggota), @js($upload ? route('keluarga.ocr', $upload) : null))"
             class="p-6"
         >
-            <h1 class="text-xl font-semibold text-gray-900 mb-1">Input Data Kartu Keluarga</h1>
-            <p class="text-sm text-gray-500 mb-4">Isi data sesuai dokumen di sebelah kiri.</p>
+            <h1 class="text-xl font-semibold text-gray-900 mb-1">Edit Data Kartu Keluarga</h1>
+            <p class="text-sm text-gray-500 mb-4">No. KK: {{ $keluarga->no_kk }}</p>
 
-            <div class="mb-6">
-                <button type="button" @click="runOcr()" :disabled="ocrLoading"
-                    class="inline-flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed">
-                    <svg x-show="ocrLoading" x-cloak class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                    </svg>
-                    <span x-text="ocrLoading ? 'Memproses OCR...' : 'Isi Otomatis dari OCR'"></span>
-                </button>
-                <p class="mt-2 text-xs text-gray-500">
-                    Mengisi otomatis field No. KK, Kepala Keluarga, Alamat, dan Kepala Dinas dari hasil pindai. Data anggota keluarga tetap diisi manual. Selalu periksa kembali hasilnya sebelum menyimpan.
-                </p>
-                <p x-show="ocrMessage" x-cloak x-text="ocrMessage"
-                    :class="ocrError ? 'text-red-600' : 'text-green-600'"
-                    class="mt-2 text-xs font-medium"></p>
-            </div>
+            @if ($upload)
+                <div class="mb-6">
+                    <button type="button" @click="runOcr()" :disabled="ocrLoading"
+                        class="inline-flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg x-show="ocrLoading" x-cloak class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                        <span x-text="ocrLoading ? 'Memproses OCR...' : 'Isi Otomatis dari OCR'"></span>
+                    </button>
+                    <p class="mt-2 text-xs text-gray-500">
+                        Mengisi otomatis field No. KK, Kepala Keluarga, Alamat, dan Kepala Dinas dari hasil pindai. Data anggota keluarga tetap diisi manual. Selalu periksa kembali hasilnya sebelum menyimpan.
+                    </p>
+                    <p x-show="ocrMessage" x-cloak x-text="ocrMessage"
+                        :class="ocrError ? 'text-red-600' : 'text-green-600'"
+                        class="mt-2 text-xs font-medium"></p>
+                </div>
+            @endif
 
             @if ($errors->any())
                 <div class="mb-6 rounded-md bg-red-50 border border-red-200 text-red-800 px-4 py-3 text-sm">
@@ -76,70 +80,71 @@
                 </nav>
             </div>
 
-            <form action="{{ route('keluarga.store', $upload) }}" method="POST">
+            <form action="{{ route('keluarga.update', $keluarga) }}" method="POST">
                 @csrf
+                @method('PUT')
 
                 {{-- Tab 1: Kepala Keluarga & Alamat --}}
                 <div x-show="activeTab === 'kepala'" x-cloak class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
                         <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-1">No. KK</label>
-                            <input type="text" name="no_kk" value="{{ old('no_kk') }}" maxlength="16"
+                            <input type="text" name="no_kk" value="{{ old('no_kk', $keluarga->no_kk) }}" maxlength="16"
                                 class="w-full rounded-md border-gray-300 border px-3 py-2 text-sm">
                         </div>
                         <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Nama Kepala Keluarga</label>
-                            <input type="text" name="nama_kepala_keluarga" value="{{ old('nama_kepala_keluarga') }}"
+                            <input type="text" name="nama_kepala_keluarga" value="{{ old('nama_kepala_keluarga', $keluarga->nama_kepala_keluarga) }}"
                                 class="w-full rounded-md border-gray-300 border px-3 py-2 text-sm">
                         </div>
                         <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Alamat</label>
                             <textarea name="alamat" rows="2"
-                                class="w-full rounded-md border-gray-300 border px-3 py-2 text-sm">{{ old('alamat') }}</textarea>
+                                class="w-full rounded-md border-gray-300 border px-3 py-2 text-sm">{{ old('alamat', $keluarga->alamat) }}</textarea>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">RT</label>
-                            <input type="text" name="rt" value="{{ old('rt') }}" maxlength="3"
+                            <input type="text" name="rt" value="{{ old('rt', $keluarga->rt) }}" maxlength="3"
                                 class="w-full rounded-md border-gray-300 border px-3 py-2 text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">RW</label>
-                            <input type="text" name="rw" value="{{ old('rw') }}" maxlength="3"
+                            <input type="text" name="rw" value="{{ old('rw', $keluarga->rw) }}" maxlength="3"
                                 class="w-full rounded-md border-gray-300 border px-3 py-2 text-sm">
                         </div>
                         <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Kode Pos</label>
-                            <input type="text" name="kode_pos" value="{{ old('kode_pos') }}" maxlength="10"
+                            <input type="text" name="kode_pos" value="{{ old('kode_pos', $keluarga->kode_pos) }}" maxlength="10"
                                 class="w-full rounded-md border-gray-300 border px-3 py-2 text-sm">
                         </div>
                         <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Desa/Kelurahan</label>
-                            <input type="text" name="desa_kelurahan" value="{{ old('desa_kelurahan') }}"
+                            <input type="text" name="desa_kelurahan" value="{{ old('desa_kelurahan', $keluarga->desa_kelurahan) }}"
                                 class="w-full rounded-md border-gray-300 border px-3 py-2 text-sm">
                         </div>
                         <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Kecamatan</label>
-                            <input type="text" name="kecamatan" value="{{ old('kecamatan') }}"
+                            <input type="text" name="kecamatan" value="{{ old('kecamatan', $keluarga->kecamatan) }}"
                                 class="w-full rounded-md border-gray-300 border px-3 py-2 text-sm">
                         </div>
                         <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Kabupaten/Kota</label>
-                            <input type="text" name="kabupaten_kota" value="{{ old('kabupaten_kota') }}"
+                            <input type="text" name="kabupaten_kota" value="{{ old('kabupaten_kota', $keluarga->kabupaten_kota) }}"
                                 class="w-full rounded-md border-gray-300 border px-3 py-2 text-sm">
                         </div>
                         <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Provinsi</label>
-                            <input type="text" name="provinsi" value="{{ old('provinsi') }}"
+                            <input type="text" name="provinsi" value="{{ old('provinsi', $keluarga->provinsi) }}"
                                 class="w-full rounded-md border-gray-300 border px-3 py-2 text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Jumlah Anggota Keluarga</label>
-                            <input type="number" name="jumlah_anggota_keluarga" min="1" value="{{ old('jumlah_anggota_keluarga') }}"
+                            <input type="number" name="jumlah_anggota_keluarga" min="1" value="{{ old('jumlah_anggota_keluarga', $keluarga->jumlah_anggota_keluarga) }}"
                                 class="w-full rounded-md border-gray-300 border px-3 py-2 text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Dikeluarkan</label>
-                            <input type="date" name="tanggal_dikeluarkan" value="{{ old('tanggal_dikeluarkan') }}"
+                            <input type="date" name="tanggal_dikeluarkan" value="{{ old('tanggal_dikeluarkan', optional($keluarga->tanggal_dikeluarkan)->format('Y-m-d')) }}"
                                 class="w-full rounded-md border-gray-300 border px-3 py-2 text-sm">
                         </div>
                     </div>
@@ -266,20 +271,24 @@
                 <div x-show="activeTab === 'dinas'" x-cloak class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nama Kepala Dinas</label>
-                        <input type="text" name="nama_kepala_dinas" value="{{ old('nama_kepala_dinas') }}"
+                        <input type="text" name="nama_kepala_dinas" value="{{ old('nama_kepala_dinas', $keluarga->nama_kepala_dinas) }}"
                             class="w-full rounded-md border-gray-300 border px-3 py-2 text-sm">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">NIP Kepala Dinas</label>
-                        <input type="text" name="nip_kepala_dinas" value="{{ old('nip_kepala_dinas') }}"
+                        <input type="text" name="nip_kepala_dinas" value="{{ old('nip_kepala_dinas', $keluarga->nip_kepala_dinas) }}"
                             class="w-full rounded-md border-gray-300 border px-3 py-2 text-sm">
                     </div>
                 </div>
 
-                <div class="mt-8 pt-6 border-t border-gray-200">
+                <div class="mt-8 pt-6 border-t border-gray-200 flex gap-3">
+                    <a href="{{ route('keluarga.index') }}"
+                        class="flex-1 text-center rounded-md border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                        Batal
+                    </a>
                     <button type="submit"
-                        class="w-full rounded-md bg-gray-800 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-900 transition">
-                        Simpan Data Kartu Keluarga
+                        class="flex-1 rounded-md bg-gray-800 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-900 transition">
+                        Simpan Perubahan
                     </button>
                 </div>
             </form>

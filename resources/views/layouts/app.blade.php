@@ -12,6 +12,10 @@
         <header class="bg-white border-b border-gray-200">
             <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
                 <a href="{{ route('upload.create') }}" class="font-semibold text-gray-800">KK Converter</a>
+                <nav class="flex items-center gap-4 text-sm">
+                    <a href="{{ route('keluarga.index') }}" class="text-gray-600 hover:text-gray-900">Daftar KK</a>
+                    <a href="{{ route('upload.create') }}" class="text-gray-600 hover:text-gray-900">Unggah KK</a>
+                </nav>
             </div>
         </header>
 

@@ -46,6 +46,10 @@
             class="flex-1 inline-flex items-center justify-center rounded-md border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
             Unggah KK Lain
         </a>
+        <a href="{{ route('keluarga.index') }}"
+            class="flex-1 inline-flex items-center justify-center rounded-md border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+            Lihat Daftar KK
+        </a>
     </div>
 </div>
 @endsection
